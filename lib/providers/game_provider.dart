@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -14,9 +16,7 @@ class GameProvider with ChangeNotifier {
 
   GameProvider() {
     _loadHighScore();
-    if (grid.isEmpty) {
-      resetGame();
-    }
+    loadGameState();
   }
 
   List<List<int>> get grid => _grid;
@@ -25,6 +25,31 @@ class GameProvider with ChangeNotifier {
 
   void _initializeGrid() {
     _grid = List.generate(4, (_) => List.generate(4, (_) => 0));
+  }
+
+  Future<void> saveGameState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('grid', jsonEncode(_grid));
+    await prefs.setInt('score', _score);
+  }
+
+  Future<void> loadGameState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final gridJson = prefs.getString('grid');
+    final score = prefs.getInt('score') ?? 0;
+
+    if (gridJson != null) {
+      List<List<int>> grid = jsonDecode(gridJson)
+          .map<List<int>>(
+            (list) => List<int>.from(list),
+          )
+          .toList();
+      _grid = grid;
+      _score = score;
+      notifyListeners();
+    } else {
+      resetGame();
+    }
   }
 
   Future<void> _loadHighScore() async {
@@ -79,6 +104,7 @@ class GameProvider with ChangeNotifier {
     }
     if (moved) _addNewTile();
     _updateHighScore();
+    saveGameState();
   }
 
   void moveRight() {
@@ -94,6 +120,7 @@ class GameProvider with ChangeNotifier {
     }
     if (moved) _addNewTile();
     _updateHighScore();
+    saveGameState();
   }
 
   void moveUp() {
@@ -114,6 +141,7 @@ class GameProvider with ChangeNotifier {
     }
     if (moved) _addNewTile();
     _updateHighScore();
+    saveGameState();
   }
 
   void moveDown() {
@@ -134,6 +162,7 @@ class GameProvider with ChangeNotifier {
     }
     if (moved) _addNewTile();
     _updateHighScore();
+    saveGameState();
   }
 
   List<int> _merge(List<int> row) {
