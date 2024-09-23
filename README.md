@@ -26,6 +26,9 @@ Cette séparation améliore la lisibilité du code et permet des mises à jour p
 ### Détection des mouvements
 L'implémentation utilise les événements onPanStart, onPanUpdate et onPanEnd pour détecter les gestes de l'utilisateur (swipes) et déclencher les mouvements correspondants dans le jeu. Cela permet une interaction fluide et intuitive.
 
+### Réalisation d'une maquette
+Après avoir développé une boucle de jeu fonctionelle mais peu ergonomique et esthétique, j'ai réalisé une maquette sur figma. J'ai ensuite modifier le design de mon appli en suivant la maquette afin d'améliorer l'expérience utilisateur. Voici le lien menant à la maquette: https://www.figma.com/proto/XvhOdPMqqqbQbPnI5oqxDp/2048?node-id=1-3&t=z9o7ZI0wMuA88qvG-1 
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
