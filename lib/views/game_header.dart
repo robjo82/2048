@@ -6,46 +6,44 @@ class GameHeader extends StatelessWidget {
   final int score;
   final int highScore;
 
-  GameHeader({required this.score, required this.highScore});
+  const GameHeader({super.key, required this.score, required this.highScore});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '2048',
-                style: TextStyle(
-                    fontSize: 72,
-                    color: Color(0xFFFDE8E9),
-                    fontWeight: FontWeight.bold,
-                    height: 0.1),
-              ),
-              Row(
-                children: [
-                  _buildScoreBox('SCORE', score),
-                  SizedBox(width: 16),
-                  _buildScoreBox('HIGH SCORE', highScore),
-                ],
-              )
-            ],
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          Row(
-            children: [
-              Spacer(),
-              _buildCancelButton(context),
-              SizedBox(width: 32),
-              _buildResetButton(context),
-            ],
-          )
-        ],
-      ),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              '2048',
+              style: TextStyle(
+                  fontSize: 72,
+                  color: Color(0xFFFDE8E9),
+                  fontWeight: FontWeight.bold,
+                  height: 0.1),
+            ),
+            Row(
+              children: [
+                _buildScoreBox('SCORE', score),
+                const SizedBox(width: 16),
+                _buildScoreBox('HIGH SCORE', highScore),
+              ],
+            )
+          ],
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        Row(
+          children: [
+            const Spacer(),
+            _buildCancelButton(context),
+            const SizedBox(width: 32),
+            _buildResetButton(context),
+          ],
+        )
+      ],
     );
   }
 

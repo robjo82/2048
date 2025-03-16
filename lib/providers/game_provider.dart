@@ -14,6 +14,9 @@ class GameProvider with ChangeNotifier {
   List<List<int>>? _previousGrid;
   int? _previousScore;
 
+  bool _isGameOver = false;
+  bool get isGameOver => _isGameOver;
+
   GameProvider() {
     _loadHighScore();
     loadGameState();
@@ -97,12 +100,15 @@ class GameProvider with ChangeNotifier {
     for (int i = 0; i < 4; i++) {
       List<int> row = _grid[i];
       List<int> newRow = _merge(row);
-      if (!ListEquality().equals(row, newRow)) {
+      if (!const ListEquality().equals(row, newRow)) {
         _grid[i] = newRow;
         moved = true;
       }
     }
-    if (moved) _addNewTile();
+    if (moved) {
+      _addNewTile();
+      _updateGameOverStatus();
+    }
     _updateHighScore();
     saveGameState();
   }
@@ -113,12 +119,15 @@ class GameProvider with ChangeNotifier {
     for (int i = 0; i < 4; i++) {
       List<int> row = _grid[i].reversed.toList();
       List<int> newRow = _merge(row).reversed.toList();
-      if (!ListEquality().equals(_grid[i], newRow)) {
+      if (!const ListEquality().equals(_grid[i], newRow)) {
         _grid[i] = newRow;
         moved = true;
       }
     }
-    if (moved) _addNewTile();
+    if (moved) {
+      _addNewTile();
+      _updateGameOverStatus();
+    }
     _updateHighScore();
     saveGameState();
   }
@@ -139,7 +148,10 @@ class GameProvider with ChangeNotifier {
         }
       }
     }
-    if (moved) _addNewTile();
+    if (moved) {
+      _addNewTile();
+      _updateGameOverStatus();
+    }
     _updateHighScore();
     saveGameState();
   }
@@ -160,7 +172,10 @@ class GameProvider with ChangeNotifier {
         }
       }
     }
-    if (moved) _addNewTile();
+    if (moved) {
+      _addNewTile();
+      _updateGameOverStatus();
+    }
     _updateHighScore();
     saveGameState();
   }
@@ -194,11 +209,28 @@ class GameProvider with ChangeNotifier {
 
   void resetGame() {
     _score = 0;
+    _isGameOver = false;
     _initializeGrid();
     _addNewTile();
     _addNewTile();
     _previousGrid = null;
     _previousScore = null;
+    notifyListeners();
+  }
+
+  bool _checkGameOver() {
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (_grid[i][j] == 0) return false;
+        if (i < 3 && _grid[i][j] == _grid[i + 1][j]) return false;
+        if (j < 3 && _grid[i][j] == _grid[i][j + 1]) return false;
+      }
+    }
+    return true;
+  }
+
+  void _updateGameOverStatus() {
+    _isGameOver = _checkGameOver();
     notifyListeners();
   }
 }

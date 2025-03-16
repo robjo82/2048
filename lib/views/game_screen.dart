@@ -4,7 +4,11 @@ import 'package:myapp/utils/tile_colors.dart';
 import 'package:myapp/views/game_header.dart';
 import 'package:provider/provider.dart';
 
+import 'game_over_overlay.dart';
+
 class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
+
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -15,71 +19,77 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color(0xFF7785FE),
-    body: Center(
-      child: FutureBuilder(
-        future: Provider.of<GameProvider>(context, listen: false).loadGameState(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-          if (snapshot.hasError) {
-            return const Text('Erreur lors du chargement du jeu');
-          }
-          return GestureDetector(
-            onPanStart: (details) {
-              _startOffset = details.globalPosition;
-            },
-            onPanUpdate: (details) {
-              _endOffset = details.globalPosition;
-            },
-            onPanEnd: (details) {
-              if (_startOffset != null && _endOffset != null) {
-                double dx = _endOffset!.dx - _startOffset!.dx;
-                double dy = _endOffset!.dy - _startOffset!.dy;
+    return Scaffold(
+      backgroundColor: const Color(0xFF7785FE),
+      body: Center(
+        child: FutureBuilder(
+          future: Provider.of<GameProvider>(context, listen: false).loadGameState(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+            if (snapshot.hasError) {
+              return const Text('Error loading game state');
+            }
+            return Stack(
+              children: [
+                GestureDetector(
+                  onPanStart: (details) {
+                    _startOffset = details.globalPosition;
+                  },
+                  onPanUpdate: (details) {
+                    _endOffset = details.globalPosition;
+                  },
+                  onPanEnd: (details) {
+                    if (_startOffset != null && _endOffset != null) {
+                      double dx = _endOffset!.dx - _startOffset!.dx;
+                      double dy = _endOffset!.dy - _startOffset!.dy;
 
-                double threshold = 20.0;
+                      double threshold = 20.0;
 
-                if (dx.abs() > threshold || dy.abs() > threshold) {
-                  if (dx.abs() > dy.abs()) {
-                    if (dx > 0) {
-                      Provider.of<GameProvider>(context, listen: false).moveRight();
-                    } else {
-                      Provider.of<GameProvider>(context, listen: false).moveLeft();
+                      if (dx.abs() > threshold || dy.abs() > threshold) {
+                        if (dx.abs() > dy.abs()) {
+                          if (dx > 0) {
+                            Provider.of<GameProvider>(context, listen: false).moveRight();
+                          } else {
+                            Provider.of<GameProvider>(context, listen: false).moveLeft();
+                          }
+                        } else {
+                          if (dy > 0) {
+                            Provider.of<GameProvider>(context, listen: false).moveDown();
+                          } else {
+                            Provider.of<GameProvider>(context, listen: false).moveUp();
+                          }
+                        }
+                      }
+                      _startOffset = null;
+                      _endOffset = null;
                     }
-                  } else {
-                    if (dy > 0) {
-                      Provider.of<GameProvider>(context, listen: false).moveDown();
-                    } else {
-                      Provider.of<GameProvider>(context, listen: false).moveUp();
-                    }
-                  }
-                }
-                _startOffset = null;
-                _endOffset = null;
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GameHeader(
-                    score: Provider.of<GameProvider>(context).score,
-                    highScore: Provider.of<GameProvider>(context).highScore,
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GameHeader(
+                          score: Provider.of<GameProvider>(context).score,
+                          highScore: Provider.of<GameProvider>(context).highScore,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildGrid(context),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildGrid(context),
-                ],
-              ),
-            ),
-          );
-        },
+                ),
+                if (Provider.of<GameProvider>(context).isGameOver)
+                  const GameOverOverlay(),
+              ],
+            );
+          },
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
 
   Widget _buildGrid(BuildContext context) {

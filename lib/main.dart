@@ -7,12 +7,14 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => GameProvider(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      home: const GameScreen(),
     );
   }
 }
